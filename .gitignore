@@ -1,3 +1,4 @@
 *.zip
 final/
 .DS_Store
+.Rhistory
