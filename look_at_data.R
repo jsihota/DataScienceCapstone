@@ -14,3 +14,11 @@ if (!file.exists("Coursera-SwiftKey.zip")) {
 if (!file.exists("final")) {
   unzip("Coursera-SwiftKey.zip")
 }
+
+# OTHER GOOD Source will be google search terms, whatsup text messages 
+#load files
+en_US_blogs = read.table("final/en_US/en_US.blogs.txt") 
+
+
+en_US_news = read.table("final/en_US/en_US.news.txt") 
+en_US_twitter = read.table("final/en_US/en_US.twitter.txt") 
