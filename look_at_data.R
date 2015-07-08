@@ -17,7 +17,8 @@ if (!file.exists("final")) {
 
 # OTHER GOOD Source will be google search terms, whatsup text messages 
 #load files
-en_US_blogs = read.table("final/en_US/en_US.blogs.txt") 
+en_US_blogs = read.table("final/en_US/en_US.blogs.txt",header = FALSE, sep = "\n") 
+head(en_US_blogs)
 
 
 en_US_news = read.table("final/en_US/en_US.news.txt") 
