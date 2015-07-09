@@ -1,9 +1,3 @@
-library(knitr)
-options(digits = 7)
-opts_chunk$set(fig.width=10)
-library(R.utils, warn.conflicts = FALSE, quietly=TRUE)
-library(data.table, warn.conflicts = FALSE, quietly=TRUE)
-library(ggplot2, warn.conflicts = FALSE, quietly=TRUE)
 
 setwd("~/class/DataScienceCapstone")
 # download file from URL
@@ -17,7 +11,27 @@ if (!file.exists("final")) {
 
 # OTHER GOOD Source will be google search terms, whatsup text messages 
 #load files
-en_US_blogs = read.table("final/en_US/en_US.twitter.txt", sep='\t', skipNul = TRUE,quote = "") 
-head(en_US_blogs)
+en_US_twitter = read.table("final/en_US/en_US.twitter.txt", sep='\t', skipNul = TRUE,quote = "") 
+str(en_US_twitter)
+
+TrimSpace <- function( x ) {
+  gsub("(^[[:space:]]+|[[:space:]]+$)", "", x)
+}
+
+
+TrimNonAlphanumeric<- function( x ) {
+  gsub("[^[:alnum:] ]", "", x)
+}
+
+CleanUpEnglish <- function(x, output) {
+  text <- TrimSpace(TrimNonAlphanumeric(x[1]))
+  print(text)
+}
+
+apply(en_US_twitter, 1, CleanUpEnglish, output = 'outputfile')
+
+
+
+
 
 

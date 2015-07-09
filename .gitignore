@@ -2,3 +2,4 @@
 final/
 .DS_Store
 .Rhistory
+.RData
