@@ -39,12 +39,11 @@ TrimNonAlphanumeric<- function( x ) {
 }
 
 TrigramTokenizer <- function(x) NGramTokenizer(x, 
-                                               Weka_control(min = 3, max = 3))
+                                               Weka_control(min = 2, max = 6))
 
 
 CleanUpEnglish <- function(x, output) {
   text <- tolower(TrimSpace(TrimNonAlphanumeric(x[1])))
-  print(text)
   tdm <- TermDocumentMatrix(Corpus(VectorSource(text)), 
                             control = list(tokenize = TrigramTokenizer))
   inspect(tdm)
