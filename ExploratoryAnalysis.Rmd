@@ -23,7 +23,7 @@ Finnish (fi_FI)
 Russian (ru_RU)
 German (de_DE)
 == Load Data
-```{r, recho=FALSE,cache=1}
+```{r, recho=FALSE}
 setwd("~/git/DataScienceCapstone")
 # download file from URL
 if (!file.exists("Coursera-SwiftKey.zip")) {
