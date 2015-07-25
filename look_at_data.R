@@ -1,5 +1,6 @@
 #install.packages("tm")
 #install.packages("RWeka")
+#install.packages("stargazer")
 
 library(tm)
 library(RWeka)

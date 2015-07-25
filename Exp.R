@@ -1,24 +1,24 @@
 setwd("~/git/DataScienceCapstone/final/en_US")
 # Read files into variables
-newsData <- readLines(file("en_US.news.txt"))
-blogData <- readLines(file("en_US.blogs.txt"))
-twitterData <- readLines(file("en_US.twitter.txt"))
+readLines("en_US.news.txt") -> en_US_news
+## Warning: incomplete final line found on 'en_US.news.txt'
+readLines("en_US.blogs.txt") -> en_US_blogs
+readLines("en_US.twitter.txt") -> en_US_twitter
 
-print(paste("News Data Length = ", length(newsData),
-            ", News Blog Length = ", length(blogData),
-            ", News twitter Length = ", length(twitterData)
-))
+library(plyr)
+library(knitr)
+## Create the list for summary
+list_en<-list(en_US_news, en_US_blogs,en_US_twitter)
+names(list_en)<- c("en_US_news", "en_US_blogs","en_US_twitter")
 
-lengths <- c(length(blogData),length(newsData),length(twitterData))
-lengths <- data.frame(lengths)
-lengths$names <- c("blogs","news","twitter")
-ggplot(lengths,aes(x=names,y=lengths)) +
-  geom_bar(stat='identity',fill='cornsilk',color='grey60') + 
-  xlab('Source') + ylab('Total Lines') + coord_flip() + 
-  geom_text(aes(label=format(lengths,big.mark=","),size=3),vjust=-0.2) +
-  scale_y_continuous(limits=c(0,2600000)) +
-  theme(legend.position='none') + 
-  ggtitle('Total Line Count by Text Source')
+## Define the function for Word-counting
+WordCounting<-function(x) length(unlist(strsplit(x,split = " ")))
+
+## Output the summary:Object size,Lines,Words
+ldply(list_en,c("object.size","length","WordCounting"))->output
+names(output) <- c("Object","Size in bytes", "Line Counts", "Word Counts")
+kable(output)
+
 
 
 
@@ -57,4 +57,3 @@ par(mfrow = c(1, 1))
 barplot(TwoGrams[1:20,2], cex.names=0.5, names.arg=TwoGrams[1:20,1], col="red", main="2-Grams", las=2)
 barplot(ThreeGrams[1:20,2], cex.names=0.5, names.arg=ThreeGrams[1:20,1], col="green", main="3-Grams", las=2)
 barplot(FourGrams[1:20,2], cex.names=0.5, names.arg=FourGrams[1:20,1], col="blue", main="4-Grams", las=2)
-```
