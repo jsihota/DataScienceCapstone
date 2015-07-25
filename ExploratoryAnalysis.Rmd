@@ -106,6 +106,13 @@ p <- ggplot(data=plotdata[1:60,],aes(id, value,fill=variable))
 p <- p + geom_bar(stat="identity")+theme(axis.text.x=element_text(angle=45, hjust=1))
 print(p)
 
+library(wordcloud)
+set.seed(123)
+data1[1:100,]->plotwordcloud
+pal <- brewer.pal(9,"BuGn")
+    pal <- pal[-(1:4)]
+wordcloud(plotwordcloud$id,freq=plotwordcloud$freq,random.order = F,color=pal)
+
 ```
 
 ## Find n-grams on the data
@@ -129,11 +136,38 @@ FourGrams <- findNGrams(corpusDf, 4)
 ```
 
 ```{r, echo=FALSE}
+require(RColorBrewer)
+
+par(mfrow = c(1, 3))
+palette <- brewer.pal(8,"Dark2")
+
+wordcloud(TwoGrams[,1], TwoGrams[,2], min.freq =1, 
+          random.order = F, ordered.colors = F, colors=palette)
+text(x=0.5, y=0, "2-gram cloud")
+
+wordcloud(ThreeGrams[,1], ThreeGrams[,2], min.freq =1, 
+          random.order = F, ordered.colors = F, colors=palette)
+text(x=0.5, y=0, "3-gram cloud")
+
+wordcloud(FourGrams[,1], FourGrams[,2], min.freq =1, 
+          random.order = F, ordered.colors = F, colors=palette)
+text(x=0.5, y=0, "4-gram cloud")
 par(mfrow = c(1, 1))
+
 
 barplot(TwoGrams[1:20,2], cex.names=0.5, names.arg=TwoGrams[1:20,1], col="red", main="2-Grams", las=2)
 barplot(ThreeGrams[1:20,2], cex.names=0.5, names.arg=ThreeGrams[1:20,1], col="green", main="3-Grams", las=2)
 barplot(FourGrams[1:20,2], cex.names=0.5, names.arg=FourGrams[1:20,1], col="blue", main="4-Grams", las=2)
 ```
+
+# Summmary
+For the final algorithm, I plan to design a ShinyApp that can help to predict by Markov chains n-gram model implementation
+
+Steps 
+
+* Finding and counting word pairs
+* From word pairs to arbitrary n-grams
+* N-gram model
+* Generative text with Markov chains
 
 
