@@ -1,12 +1,15 @@
+
 ---
 title: "Exploratory analysis"
 author: "jagdeep s sihota"
 date: "July 24, 2015"
 output: html_document
 ---
+
+
 # Synnopsis
-The goal of this report is to perform a thorough exploratory analysis of the data, understanding the distribution of words and relationship between the words in the corpora and understand frequencies of words and word pairs. Around the world, people are spending an increasing amount of time on their mobile devices for email, social networking, banking and a whole range of other activities. But typing on mobile devices can be a serious pain. The keyboard presents three options for what the next word might be. For example, the three words might be gym, store, restaurant. We will work on understanding and building predictive text models like those used by SwiftKey. This report will start with the basics, analyzing a large corpus of text documents to discover the structure in the data and how words are put together. 
-We will focues on 
+The goal of this report is to perform a thorough exploratory analysis of the data, understanding the distribution of words and relationship between the words in the corpora and understand frequencies of words and word pairs. Around the world, people are spending an increasing amount of time on their mobile devices for email, social networking, banking and a whole range of other activities. But typing on mobile devices can be a serious pain.  We will work on understanding and building predictive text models like those used by SwiftKey. This report will start with the basics, analyzing a large corpus of text documents to discover the structure in the data and how words are put together. 
+
   
 # Dataset
 The data is from a corpus called HC Corpora (www.corpora.heliohost.org). See the readme file at http://www.corpora.heliohost.org/aboutcorpus.html for details on the corpora available. The files have been language filtered but may still contain some foreign text. The dataset can be downloaded from https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip.
@@ -24,9 +27,9 @@ The data sources come in 4 different languages:
 * Russian (ru_RU)
 * German (de_DE)
 
-# Load Data
 
-```{r, echo=FALSE,chunk1,cache=TRUE}
+
+```{r, echo=FALSE,chunk1,cache=TRUE,message=F, warning=F}
 setwd("~/git/DataScienceCapstone")
 # download file from URL
 if (!file.exists("Coursera-SwiftKey.zip")) {
@@ -56,13 +59,13 @@ names(output) <- c("File Name","Size in bytes", "Line Counts", "Word Counts")
 ```
 
 # Summarise the data
-```{r kable, echo=FALSE, include = TRUE}
+```{r kable, echo=FALSE, include = TRUE,message=F, warning=F}
 ## Output the summary:Object size,Lines,Words
 library(knitr)
 kable(output)
 ```
 ## sampling data and data cleanup
-For  performance reasons, only the first 10000 lines are loaded for the purpose of this report and cleanup the remove 
+For  performance reasons, only the first 10000 lines are loaded for the purpose of this report and cleanup the data by removing following:  
 
 * Whitespace
 * Numbers
@@ -72,9 +75,9 @@ For  performance reasons, only the first 10000 lines are loaded for the purpose 
 # Exploratory Data Analysis
 
 ## Word Frequency
-A term-document matrix represents the relationship between terms and documents, where each row stands for a term and each column for a document, and an entry is the number of occurrences of the term in the document
+Frequencies of top 30 words in combined 30000 lines
 
-```{r, echo=FALSE,chunk2,cache=TRUE}
+```{r, echo=FALSE,chunk2,cache=TRUE,message=F, warning=F}
 library(tm)
 merged <- paste(newsData[1:10000], blogData[1:10000], twitterData[1:10000])
 corpus <- VCorpus(VectorSource(merged))
@@ -84,7 +87,7 @@ corpus <- tm_map(corpus, removePunctuation)
 corpus <- tm_map(corpus, removeWords, stopwords())
 ```
 
-```{r, echo=FALSE}
+```{r , echo=FALSE,message=F, warning=F}
 library(RWeka)
 library(tm)
 doc <- TermDocumentMatrix(corpus)
@@ -98,25 +101,11 @@ data1 <- data.frame(id = names,
                   twitter = M1[,3],
                   freq = freq)
 data1 <- data1[order,] 
-
-library(reshape2)
-library(ggplot2)
-melt(data1[1:20,],id="id")->plotdata
-p <- ggplot(data=plotdata[1:60,],aes(id, value,fill=variable))
-p <- p + geom_bar(stat="identity")+theme(axis.text.x=element_text(angle=45, hjust=1))
-print(p)
-
-library(wordcloud)
-set.seed(123)
-data1[1:100,]->plotwordcloud
-pal <- brewer.pal(9,"BuGn")
-    pal <- pal[-(1:4)]
-wordcloud(plotwordcloud$id,freq=plotwordcloud$freq,random.order = F,color=pal)
-
+data1[1:30,]
 ```
 
-## Find n-grams on the data
-```{r, echo=FALSE,chunk3,cache=TRUE}
+## Word pairs 
+```{r, echo=FALSE,chunk3,cache=TRUE,message=F, warning=F}
 corpusDf <-data.frame(text=unlist(sapply(corpus, 
                   `[`, "content")), stringsAsFactors=F)
 
@@ -135,11 +124,18 @@ ThreeGrams <- findNGrams(corpusDf, 3)
 FourGrams <- findNGrams(corpusDf, 4)
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE,message=F, warning=F}
 require(RColorBrewer)
+library(wordcloud)
 
-par(mfrow = c(1, 3))
+
+par(mfrow = c(1, 4))
 palette <- brewer.pal(8,"Dark2")
+set.seed(123)
+data1[1:100,]->plotwordcloud
+pal <- brewer.pal(9,"BuGn")
+    pal <- pal[-(1:4)]
+wordcloud(plotwordcloud$id,freq=plotwordcloud$freq,random.order = F,color=pal)
 
 wordcloud(TwoGrams[,1], TwoGrams[,2], min.freq =1, 
           random.order = F, ordered.colors = F, colors=palette)
@@ -155,12 +151,13 @@ text(x=0.5, y=0, "4-gram cloud")
 par(mfrow = c(1, 1))
 
 
+
 barplot(TwoGrams[1:20,2], cex.names=0.5, names.arg=TwoGrams[1:20,1], col="red", main="2-Grams", las=2)
 barplot(ThreeGrams[1:20,2], cex.names=0.5, names.arg=ThreeGrams[1:20,1], col="green", main="3-Grams", las=2)
 barplot(FourGrams[1:20,2], cex.names=0.5, names.arg=FourGrams[1:20,1], col="blue", main="4-Grams", las=2)
 ```
 
-# Summmary
+# Summary
 For the final algorithm, I plan to design a ShinyApp that can help to predict by Markov chains n-gram model implementation
 
 Steps 
