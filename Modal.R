@@ -1,13 +1,14 @@
-setwd("~/git/DataScienceCapstone")
-merged <- readLines(file("merged.txt"))
 
+#install.packages("scales")
 library(tm)
 library(RWeka)
-#install.packages("Matrix")
-#install.packages("stringi")
-library("Matrix")
-library("data.table")
-library("stringi")
+library(Matrix)
+library(data.table)
+library(stringi)
+library(stringr)
+library(scales)
+library(R.cache)
+# stringr, ggplot2, tm, RWeka, SnowballC, Matrix, scales, stringi
 
 
 create_corpus <- function (text) {
@@ -19,7 +20,6 @@ create_corpus <- function (text) {
   corpus <- tm_map (corpus, content_transformer (remove_nonprint))    
   corpus <- tm_map (corpus, removePunctuation)
   corpus <- tm_map (corpus, removeNumbers)
-  #corpus <- tm_map (corpus, stemDocument, language = "english")
   corpus <- tm_map (corpus, stripWhitespace)
   corpus <- tm_map (corpus, content_transformer (stri_trim_both))
   
@@ -60,6 +60,32 @@ create_model <- function (tdm, cutoff = 3) {
   # uni-gram, bi-gram or tri-gram?
   model [, gram := sapply (strsplit (prev_words, split = " "), length) + 1 ]
   
+}
+
+classname <- function (name) paste (class (get (name)), collapse = " ")
+
+#
+# if a data set does not already exist, create and
+# cache it.  if the data set already exists, do nothing.
+#
+cache_if_missing <- function (name, data, 
+                              cache_write = TRUE) {
+  
+  if (!data.exists(name)) {
+    message ("creating data set: ", name, " @ ", Sys.time())
+    
+    # assign the data set to the given name
+    assign (name, data, inherits = TRUE)
+    
+    # cache the data set, if allowed
+    if (cache_write) {
+      cache (name)   
+      message (sprintf ("saving to cache: %s [%s] @ %s", name, classname (name), Sys.time()))
+    }
+    
+  } else {
+    message (sprintf ("loaded from cache: %s [%s] @ %s", name, classname (name), Sys.time()))
+  }
 }
 
 split_on_space <- function (x) {
@@ -114,7 +140,33 @@ predict_next_word <- function (phrase, model, n = 3) {
   
   return (prediction)
 }
+
+lines <- function () {
+  setwd("~/git/DataScienceCapstone")
+  text <- readLines(file("mergedSmall.txt"))
+}
+
+data.exists <- function (data.name) {
+  stopifnot (is.character (data.name))
+  exists (data.name) && !is.function ( get (data.name))
+}
+
+
+cache_if_missing ("lines", lines)
+
+
 corpus <- create_corpus(merged)
+# clean-up
+rm (merged)
+gc ()
+
 tdm <- create_tdm(corpus)
+rm (corpus)
+gc ()
+
 tokenModel <- create_model(tdm)
-predict_next_word ("Bill falls down the", tokenModel, n = 4)
+rm (tdm)
+gc ()
+
+predict_next_word ("You're the reason why I smile everyday. Can you follow me please? It would mean the", tokenModel, n = 4)
+
