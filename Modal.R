@@ -1,5 +1,5 @@
 
-#install.packages("scales")
+#install.packages("SnowballC")
 library(tm)
 library(RWeka)
 library(Matrix)
@@ -7,7 +7,7 @@ library(data.table)
 library(stringi)
 library(stringr)
 library(scales)
-library(R.cache)
+library(SnowballC)
 # stringr, ggplot2, tm, RWeka, SnowballC, Matrix, scales, stringi
 
 
@@ -151,22 +151,37 @@ data.exists <- function (data.name) {
   exists (data.name) && !is.function ( get (data.name))
 }
 
+build.modal <- function () {
+token <- lines()
+cache_if_missing ("train.corpus", { create_corpus (token) })
+if (data.exists("token")){
+  rm (token)
+  gc ()
+}
 
-cache_if_missing ("lines", lines)
-
-
-corpus <- create_corpus(merged)
+options (mc.cores = 1)
+# create a tdm for training with 1-grams, 2-grams, and 3-grams
+cache_if_missing ("train.tdm", create_tdm (train.corpus))
 # clean-up
-rm (merged)
-gc ()
+if (data.exists("train.corpus")){
+  rm (train.corpus)
+}
 
-tdm <- create_tdm(corpus)
-rm (corpus)
-gc ()
+# create and cache the n-gram model
+cache_if_missing ("model", create_model (train.tdm, cutoff = 3))
+# clean-up
 
-tokenModel <- create_model(tdm)
-rm (tdm)
-gc ()
+if (data.exists(train.tdm)){
+  rm (train.tdm)
+}
+}
 
-predict_next_word ("You're the reason why I smile everyday. Can you follow me please? It would mean the", tokenModel, n = 4)
+predict (word)
+{
+  if (!data.exists("model")){
+    build.modal()
+  }
+  predict_next_word(word,loadcache("model"))
+}
 
+predict("Jack jumps highest of all.")
