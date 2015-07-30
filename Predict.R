@@ -47,16 +47,53 @@ findNGrams <- function(corp, grams) {
   ngram <- NGramTokenizer(corp, Weka_control(min = grams, max = grams,
                                              delimiters = " \\r\\n\\t.,;:\"()?!"))
   ngram2 <- data.frame(table(ngram))
-  #pick only top 25
-  # ngram3 <- ngram2[order(ngram2$Freq,decreasing = TRUE),][1:100,]
   ngram3 <- ngram2[order(ngram2$Freq,decreasing = TRUE),]
   colnames(ngram3) <- c("String","Count")
   ngram3
 }
 
-TwoGrams <- findNGrams(corpusDf, 2)
-ThreeGrams <- findNGrams(corpusDf, 3)
-FourGrams <- findNGrams(corpusDf, 4)
+
+#install.packages("hash")
+library("hash")
+ngram <- NGramTokenizer(corpusDf, Weka_control(min = 3, max = 3,
+                                           delimiters = " \\r\\n\\t.,;:\"()?!"))
+tokenHash <- hash()
+for (n in ngram) {
+  splitString = unlist(strsplit(n, " "))
+  token <- paste(splitString[1], splitString[2], sep=" ")
+  if (all( has.key( token, tokenHash ) ))
+  {
+    print("has key")
+    
+  }
+  else
+  {
+    print("New")
+    nextHash <- hash()
+    set(tokenHash, key=token, values=splitString[3])
+    
+  }
+  
+}
+
+
+
+ngram2 <- data.frame(table(ngram))
+ngram3 <- ngram2[order(ngram2$Freq,decreasing = TRUE),]
+colnames(ngram3) <- c("String","Count")
+ngram3
+
+ThreeGrams[,1][1]
+
+for(i in 1:length(ThreeGrams[,1])){
+  x = ThreeGrams[,1][i]
+  y = ThreeGrams[,2][i]
+  print(y)
+  print(x)
+}
+
+
+
 
 # http://www.decontextualize.com/teaching/rwet/n-grams-and-markov-chains/
 #http://www.umiacs.umd.edu/~jimmylin/CMSC723-2009-Fall/session9-slides.pdf
