@@ -176,8 +176,11 @@ build.modal <- function () {
   }
 }
 
-model <- readRDS("predictmodel.rds")
-if(!exists(model))
+if (!exists("model")){
+  model <- readRDS("predictmodel.rds")
+}
+
+if(!exists("model"))
 {
   model <- build.modal()
   saveRDS(model, "predictmodel.rds")
