@@ -142,8 +142,8 @@ predict_next_word <- function (phrase, model, n = 3) {
 }
 
 lines <- function () {
-  setwd("~/git/DataScienceCapstone")
-  text <- readLines(file("mergedSmall.txt"))
+  setwd("C:\\Git\\DataScienceCapstone")
+  text <- readLines(file("merged.txt"))
 }
 
 data.exists <- function (data.name) {
@@ -152,36 +152,36 @@ data.exists <- function (data.name) {
 }
 
 build.modal <- function () {
-token <- lines()
-cache_if_missing ("train.corpus", { create_corpus (token) })
-if (data.exists("token")){
-  rm (token)
-  gc ()
-}
-
-options (mc.cores = 1)
-# create a tdm for training with 1-grams, 2-grams, and 3-grams
-cache_if_missing ("train.tdm", create_tdm (train.corpus))
-# clean-up
-if (data.exists("train.corpus")){
-  rm (train.corpus)
-}
-
-# create and cache the n-gram model
-cache_if_missing ("model", create_model (train.tdm, cutoff = 3))
-# clean-up
-
-if (data.exists(train.tdm)){
-  rm (train.tdm)
-}
-}
-
-predict (word)
-{
-  if (!data.exists("model")){
-    build.modal()
+  token <- lines()
+  cache_if_missing ("train.corpus", { create_corpus (token) })
+  if (data.exists("token")){
+    rm (token)
+    gc ()
   }
-  predict_next_word(word,loadcache("model"))
+
+  options (mc.cores = 1)
+  # create a tdm for training with 1-grams, 2-grams, and 3-grams
+  cache_if_missing ("train.tdm", create_tdm (train.corpus))
+  # clean-up
+  if (data.exists("train.corpus")){
+    rm (train.corpus)
+  }
+  
+  # create and cache the n-gram model
+  cache_if_missing ("model", create_model (train.tdm, cutoff = 3))
+  # clean-up
+  
+  if (data.exists(train.tdm)){
+    rm (train.tdm)
+  }
 }
 
-predict("Jack jumps highest of all.")
+model <- readRDS("predictmodel.rds")
+if(!exists(model))
+{
+  model <- build.modal()
+  saveRDS(model, "predictmodel.rds")
+}
+predict_next_word("Jack jumps highest of all.",model)
+
+
